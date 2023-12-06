@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         val button: MaterialButton = view as MaterialButton
         val buttonText: String = button.text.toString()
         var dataToCalculate = solutionTv!!.text.toString()
+
         if (buttonText == "AC") {
             solutionTv!!.text = ""
             resultTv!!.text = "0"
@@ -82,16 +83,31 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             solutionTv!!.text = resultTv!!.text
             return
         }
-        dataToCalculate = if (buttonText == "C") {
-            dataToCalculate.substring(0, dataToCalculate.length - 1)
+        if (buttonText == "C") {
+            // Handle clear button
+            dataToCalculate = dataToCalculate.substring(0, dataToCalculate.length - 1)
+        } else if (isOperator(buttonText)) {
+            // Handle operators
+            if (dataToCalculate.isNotEmpty() && isOperator(dataToCalculate.last().toString())) {
+                // Replace the last operator with the new one
+                dataToCalculate = dataToCalculate.substring(0, dataToCalculate.length - 1) + buttonText
+            } else {
+                // Append the operator
+                dataToCalculate += buttonText
+            }
+            // Update result immediately when an operator is clicked
+            resultTv!!.text = getResult(dataToCalculate)
         } else {
-            dataToCalculate + buttonText
+            // Handle numbers and other buttons
+            dataToCalculate += buttonText
         }
+
+        // Update the solution text
         solutionTv!!.text = dataToCalculate
-        val finalResult = getResult(dataToCalculate)
-        if (finalResult != "Err") {
-            resultTv!!.text = finalResult
-        }
+    }
+
+    private fun isOperator(text: String): Boolean {
+        return text in listOf("+", "-", "*", "/")
     }
 
     fun getResult(data: String?): String {
